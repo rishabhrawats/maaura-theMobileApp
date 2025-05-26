@@ -1,34 +1,44 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useEffect } from "react";
+import { Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function SplashScreen({ navigation }) {
+const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('Login');
-    }, 2000);
+      navigation.replace("Login");
+    }, 2000); // 2 seconds delay
 
-    return () => clearTimeout(timer);
+    return () => clearTimeout(timer); // Cleanup on unmount
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Awesome App</Text>
-      <ActivityIndicator size="large" color="#3800F5" />
-    </View>
+    <SafeAreaView style={styles.splashScreen}>
+      <Text style={styles.maaura}>Maaura</Text>
+    </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',  // white background like login
-    justifyContent: 'center',
-    alignItems: 'center',
+  maaura: {
+    position: "absolute",
+    marginLeft: -42.5,
+    top: 388,
+    left: "50%",
+    fontSize: 24,
+    letterSpacing: -0.2,
+    lineHeight: 36,
+    fontWeight: "600",
+    fontFamily: "Inter-SemiBold",
+    color: "#000",
+    textAlign: "center",
   },
-  title: {
-    fontSize: 32,
-    color: '#3800F5',  // main accent color from login screen
-    marginBottom: 20,
-    fontWeight: 'bold',
+  splashScreen: {
+    backgroundColor: "#fff",
+    flex: 1,
+    width: "100%",
+    height: 812,
+    overflow: "hidden",
   },
 });
+
+export default SplashScreen;

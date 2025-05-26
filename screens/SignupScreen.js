@@ -29,7 +29,7 @@ export default function SignupScreen({ navigation }) {
         <LinearGradient
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
-          colors={["#F8F9FB", "#EBE7FA"]}
+          colors={["#F8F9FB", "#ffffff"]}
           style={styles.gradientContainer}
         >
           <Text style={styles.title}>Sign Up</Text>

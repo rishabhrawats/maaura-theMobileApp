@@ -25,7 +25,7 @@ export default ({ navigation }) => {
             alignItems: "center",
             paddingVertical: 100,
             paddingHorizontal: 32,
-            backgroundColor: "#EBE7FA",
+            backgroundColor: "#ffffff",
             position: "relative",
           }}
         >
