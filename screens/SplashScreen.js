@@ -13,20 +13,14 @@ const SplashScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.splashScreen}>
-      <Text style={styles.maaura}>Maaura</Text>
+      <Text style={styles.maaura}>MindVelocity</Text>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   maaura: {
-    position: "absolute",
-    marginLeft: -42.5,
-    top: 388,
-    left: "50%",
-    fontSize: 24,
-    letterSpacing: -0.2,
-    lineHeight: 36,
+    fontSize: 32,
     fontWeight: "600",
     fontFamily: "Inter-SemiBold",
     color: "#000",
@@ -36,8 +30,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     flex: 1,
     width: "100%",
-    height: 812,
-    overflow: "hidden",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
