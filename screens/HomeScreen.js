@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { auth } from '../config/firebase';
+import { signOut } from 'firebase/auth';
 
 export default function HomeScreen({ setIsLoggedIn }) {
   const handleSignOut = async () => {
     try {
-      await auth().signOut();
+      await signOut(auth);
       setIsLoggedIn(false);
     } catch (error) {
       console.error(error);
@@ -16,7 +17,7 @@ export default function HomeScreen({ setIsLoggedIn }) {
   return (
     <View style={styles.container}>
       <Text style={styles.welcomeText}>Welcome to Maaura!</Text>
-      <Text style={styles.emailText}>{auth().currentUser?.email}</Text>
+      <Text style={styles.emailText}>{auth.currentUser?.email}</Text>
       
       <TouchableOpacity
         style={styles.signOutButton}
