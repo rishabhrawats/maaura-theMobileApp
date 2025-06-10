@@ -11,6 +11,12 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { auth, GoogleSignin } from '../config/firebase';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithCredential,
+  GoogleAuthProvider,
+} from 'firebase/auth';
 
 export default ({ navigation, setIsLoggedIn }) => {
   const [activeTab, setActiveTab] = useState("login");
@@ -26,7 +32,7 @@ export default ({ navigation, setIsLoggedIn }) => {
 
     try {
       setLoading(true);
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       console.log("User signed up:", userCredential.user.uid);
       setIsLoggedIn(true);
     } catch (error) {
@@ -44,7 +50,7 @@ export default ({ navigation, setIsLoggedIn }) => {
 
     try {
       setLoading(true);
-      const userCredential = await auth().signInWithEmailAndPassword(email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log("User logged in:", userCredential.user.uid);
       setIsLoggedIn(true);
     } catch (error) {
@@ -61,10 +67,10 @@ export default ({ navigation, setIsLoggedIn }) => {
       const { idToken } = await GoogleSignin.signIn();
 
       // Create a Google credential with the token
-      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      const googleCredential = GoogleAuthProvider.credential(idToken);
 
       // Sign-in the user with the credential
-      const userCredential = await auth().signInWithCredential(googleCredential);
+      const userCredential = await signInWithCredential(auth, googleCredential);
       console.log("User signed in with Google:", userCredential.user.uid);
       setIsLoggedIn(true);
     } catch (error) {
