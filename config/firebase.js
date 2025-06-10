@@ -1,5 +1,5 @@
-import { initializeApp } from '@react-native-firebase/app';
-import auth from '@react-native-firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 // Your web app's Firebase configuration
@@ -9,15 +9,16 @@ const firebaseConfig = {
   projectId: "your-app",
   storageBucket: "your-app.appspot.com",
   messagingSenderId: "your-sender-id",
-  appId: "your-app-id"
+  appId: "your-app-id",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 // Initialize Google Sign-In
 GoogleSignin.configure({
   webClientId: 'your-web-client-id', // Get this from Firebase Console
 });
 
-export { auth, GoogleSignin }; 
+export { auth, GoogleSignin };
