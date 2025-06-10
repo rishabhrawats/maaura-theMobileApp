@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, Text, TouchableOpacity, Alert, ScrollView } from "react-native";
+import { firestore, auth } from "../config/firebase"; // Import Firestore and Auth from firebase.js
 
 export default ({ navigation, setHasCompletedQuestionnaire }) => {
   const questions = [
@@ -67,10 +68,16 @@ export default ({ navigation, setHasCompletedQuestionnaire }) => {
   const [answers, setAnswers] = useState([]); // Stores answers for each question
   const [isIntroScreen, setIsIntroScreen] = useState(true); // Tracks whether we are on the intro screen
   const [timer, setTimer] = useState(30); // 30-second timer for each question
+  const [userEmail, setUserEmail] = useState(""); // To store the user's email
 
+  // Fetch the user's email when the component mounts
   useEffect(() => {
-    let interval;
+    const user = auth.currentUser;
+    if (user) {
+      setUserEmail(user.email); // Get the email of the logged-in user
+    }
 
+    let interval;
     if (!isIntroScreen) {
       // Start the timer if the intro screen is passed
       interval = setInterval(() => {
@@ -89,7 +96,6 @@ export default ({ navigation, setHasCompletedQuestionnaire }) => {
   }, [isIntroScreen, currentQuestionIndex]);
 
   const handleAnswerSelection = (answer) => {
-    // Store the answer
     if (answer) {
       setAnswers((prevAnswers) => [...prevAnswers, answer]);
     }
@@ -104,22 +110,32 @@ export default ({ navigation, setHasCompletedQuestionnaire }) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (answers.length > questions.length) {
       Alert.alert("Error", "Please answer all questions before submitting.");
       return;
     }
 
-    // Update the state to indicate that the questionnaire has been completed
-    setHasCompletedQuestionnaire(true);
+    // Save answers to Firestore
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        // Only saving email and answers without timestamp
+        await firestore.collection("questionnaire_answers").add({
+          email: user.email,  // Store user email
+          answers: answers,   // Store answers
+        });
 
-    // After submission, navigate to HomeScreen or another screen
-    Alert.alert("Success", "Thank you for your answers!", [
-      {
-        text: "OK",
-        onPress: () => navigation.navigate("Home"), // Navigate to HomeScreen after completion
-      },
-    ]);
+        Alert.alert("Success", "Your answers have been saved!");
+        setHasCompletedQuestionnaire(true);
+        navigation.navigate("Home");
+      } else {
+        Alert.alert("Error", "User is not authenticated.");
+      }
+    } catch (error) {
+      console.error("Error saving answers: ", error);  // Log the error to see what went wrong
+      Alert.alert("Error", "Failed to save your answers. Please try again.");
+    }
   };
 
   const handleStart = () => {
@@ -138,10 +154,7 @@ export default ({ navigation, setHasCompletedQuestionnaire }) => {
               <Text style={styles.infoText}>
                 You will have 30 seconds to answer each question. Try to answer as quickly as possible.
               </Text>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={handleStart}
-              >
+              <TouchableOpacity style={styles.button} onPress={handleStart}>
                 <Text style={styles.buttonText}>Continue</Text>
               </TouchableOpacity>
             </View>
