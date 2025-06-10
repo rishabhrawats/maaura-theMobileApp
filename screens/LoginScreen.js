@@ -1,83 +1,41 @@
 import React, { useState } from "react";
-import {
-  SafeAreaView,
-  View,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  Image,
-  ActivityIndicator,
-} from "react-native";
-import { auth, GoogleSignin } from '../config/firebase';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithCredential,
-  GoogleAuthProvider,
-} from 'firebase/auth';
+import { SafeAreaView, View, ScrollView, Image, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { auth, googleProvider } from '../config/firebase';
 
-export default ({ navigation, setIsLoggedIn }) => {
-  const [activeTab, setActiveTab] = useState("login");
+export default ({ navigation }) => {
+  const [activeTab, setActiveTab] = useState("login"); // 'login' or 'signup'
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      console.log("User signed up:", userCredential.user.uid);
-      setIsLoggedIn(true);
-    } catch (error) {
-      Alert.alert("Error", error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Login function
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
-    }
-
     try {
-      setLoading(true);
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log("User logged in:", userCredential.user.uid);
-      setIsLoggedIn(true);
+      await auth.signInWithEmailAndPassword(email, password);
+      Alert.alert("Success", "You have logged in successfully");
     } catch (error) {
       Alert.alert("Error", error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  // Sign up function
+  const handleSignUp = async () => {
     try {
-      setLoading(true);
-      // Get the users ID token
-      const { idToken } = await GoogleSignin.signIn();
-
-      // Create a Google credential with the token
-      const googleCredential = GoogleAuthProvider.credential(idToken);
-
-      // Sign-in the user with the credential
-      const userCredential = await signInWithCredential(auth, googleCredential);
-      console.log("User signed in with Google:", userCredential.user.uid);
-      setIsLoggedIn(true);
+      await auth.createUserWithEmailAndPassword(email, password);
+      Alert.alert("Success", "Account created successfully");
     } catch (error) {
-      console.error(error);
       Alert.alert("Error", error.message);
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  // Google login function
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await auth.signInWithPopup(googleProvider);
+      if (result.user) {
+        Alert.alert("Success", "Logged in with Google");
+      }
+    } catch (error) {
+      Alert.alert("Error", error.message);
     }
   };
 
@@ -104,7 +62,6 @@ export default ({ navigation, setIsLoggedIn }) => {
             position: "relative",
           }}
         >
-          {/* Light top layer for subtle gradient effect */}
           <View
             style={{
               position: "absolute",
@@ -118,7 +75,6 @@ export default ({ navigation, setIsLoggedIn }) => {
               borderTopRightRadius: 8,
             }}
           />
-
           <Text
             style={{
               fontSize: 24,
@@ -131,7 +87,6 @@ export default ({ navigation, setIsLoggedIn }) => {
             MindVelocity
           </Text>
 
-          {/* Tabs container */}
           <View
             style={{
               flexDirection: "row",
@@ -143,7 +98,6 @@ export default ({ navigation, setIsLoggedIn }) => {
               maxWidth: 360,
             }}
           >
-            {/* Login Tab */}
             <TouchableOpacity
               onPress={() => setActiveTab("login")}
               style={{
@@ -170,7 +124,6 @@ export default ({ navigation, setIsLoggedIn }) => {
               </Text>
             </TouchableOpacity>
 
-            {/* Signup Tab */}
             <TouchableOpacity
               onPress={() => setActiveTab("signup")}
               style={{
@@ -198,7 +151,6 @@ export default ({ navigation, setIsLoggedIn }) => {
             </TouchableOpacity>
           </View>
 
-          {/* Form inputs & buttons container */}
           <View style={{ width: "100%", maxWidth: 360 }}>
             {/* Email Input */}
             <View
@@ -262,239 +214,104 @@ export default ({ navigation, setIsLoggedIn }) => {
 
             {/* Login Button */}
             {activeTab === "login" && (
-              <>
-                <TouchableOpacity
-                  style={{
-                    alignItems: "center",
-                    backgroundColor: "#3800F5",
-                    borderRadius: 12,
-                    paddingVertical: 16,
-                    marginBottom: 20,
-                    shadowColor: "#0000001A",
-                    shadowOpacity: 0.1,
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowRadius: 6,
-                    elevation: 6,
-                    opacity: loading ? 0.7 : 1,
-                  }}
-                  onPress={handleLogin}
-                  disabled={loading}
-                >
-                  <Text
-                    style={{
-                      color: "#FFFFFF",
-                      fontSize: 18,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {loading ? "Loading..." : "Log In"}
-                  </Text>
-                </TouchableOpacity>
-
+              <TouchableOpacity
+                style={{
+                  alignItems: "center",
+                  backgroundColor: "#3800F5",
+                  borderRadius: 12,
+                  paddingVertical: 16,
+                  marginBottom: 20,
+                  shadowColor: "#0000001A",
+                  shadowOpacity: 0.1,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowRadius: 6,
+                  elevation: 6,
+                }}
+                onPress={handleLogin}
+              >
                 <Text
                   style={{
-                    color: "#3A00FF",
-                    fontSize: 14,
-                    marginBottom: 30,
-                    textAlign: "center",
+                    color: "#FFFFFF",
+                    fontSize: 18,
+                    fontWeight: "bold",
                   }}
                 >
-                  Forgot Password?
+                  Log In
                 </Text>
-
-                {/* Separator */}
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 30,
-                  }}
-                >
-                  <View
-                    style={{
-                      flex: 1,
-                      height: 1,
-                      backgroundColor: "#F3F4F6",
-                      marginRight: 12,
-                    }}
-                  />
-                  <Text
-                    style={{
-                      color: "#9CA3AF",
-                      fontSize: 14,
-                      marginHorizontal: 8,
-                    }}
-                  >
-                    or
-                  </Text>
-                  <View
-                    style={{
-                      flex: 1,
-                      height: 1,
-                      backgroundColor: "#F3F4F6",
-                      marginLeft: 12,
-                    }}
-                  />
-                </View>
-
-                {/* Login with Google Button */}
-                <TouchableOpacity
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "#FFFFFF",
-                    borderColor: "#ECE6FF",
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    paddingVertical: 14,
-                    shadowColor: "#0000001A",
-                    shadowOpacity: 0.1,
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowRadius: 3,
-                    elevation: 3,
-                    opacity: loading ? 0.7 : 1,
-                  }}
-                  onPress={handleGoogleSignIn}
-                  disabled={loading}
-                >
-                  <Image
-                    source={{
-                      uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/rEqCGMmILJ/757sq175_expires_30_days.png",
-                    }}
-                    resizeMode={"stretch"}
-                    style={{
-                      borderRadius: 12,
-                      width: 18,
-                      height: 18,
-                      marginRight: 12,
-                    }}
-                  />
-                  <Text
-                    style={{
-                      color: "#000000",
-                      fontSize: 16,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Log in with Google
-                  </Text>
-                </TouchableOpacity>
-              </>
+              </TouchableOpacity>
             )}
 
-            {/* Signup Button */}
+            {/* Sign Up Button */}
             {activeTab === "signup" && (
-              <>
-                <TouchableOpacity
+              <TouchableOpacity
+                style={{
+                  alignItems: "center",
+                  backgroundColor: "#3800F5",
+                  borderRadius: 12,
+                  paddingVertical: 16,
+                  marginTop: 10,
+                  marginBottom: 20,
+                  shadowColor: "#0000001A",
+                  shadowOpacity: 0.1,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowRadius: 6,
+                  elevation: 6,
+                }}
+                onPress={handleSignUp}
+              >
+                <Text
                   style={{
-                    alignItems: "center",
-                    backgroundColor: "#3800F5",
-                    borderRadius: 12,
-                    paddingVertical: 16,
-                    marginTop: 10,
-                    marginBottom: 20,
-                    shadowColor: "#0000001A",
-                    shadowOpacity: 0.1,
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowRadius: 6,
-                    elevation: 6,
-                    opacity: loading ? 0.7 : 1,
-                  }}
-                  onPress={handleSignUp}
-                  disabled={loading}
-                >
-                  <Text
-                    style={{
-                      color: "#FFFFFF",
-                      fontSize: 18,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {loading ? "Loading..." : "Sign Up"}
-                  </Text>
-                </TouchableOpacity>
-
-                {/* Separator */}
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 30,
+                    color: "#FFFFFF",
+                    fontSize: 18,
+                    fontWeight: "bold",
                   }}
                 >
-                  <View
-                    style={{
-                      flex: 1,
-                      height: 1,
-                      backgroundColor: "#F3F4F6",
-                      marginRight: 12,
-                    }}
-                  />
-                  <Text
-                    style={{
-                      color: "#9CA3AF",
-                      fontSize: 14,
-                      marginHorizontal: 8,
-                    }}
-                  >
-                    or
-                  </Text>
-                  <View
-                    style={{
-                      flex: 1,
-                      height: 1,
-                      backgroundColor: "#F3F4F6",
-                      marginLeft: 12,
-                    }}
-                  />
-                </View>
-
-                {/* Sign up with Google Button */}
-                <TouchableOpacity
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "#FFFFFF",
-                    borderColor: "#ECE6FF",
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    paddingVertical: 14,
-                    shadowColor: "#0000001A",
-                    shadowOpacity: 0.1,
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowRadius: 3,
-                    elevation: 3,
-                    opacity: loading ? 0.7 : 1,
-                  }}
-                  onPress={handleGoogleSignIn}
-                  disabled={loading}
-                >
-                  <Image
-                    source={{
-                      uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/rEqCGMmILJ/757sq175_expires_30_days.png",
-                    }}
-                    resizeMode={"stretch"}
-                    style={{
-                      borderRadius: 12,
-                      width: 18,
-                      height: 18,
-                      marginRight: 12,
-                    }}
-                  />
-                  <Text
-                    style={{
-                      color: "#000000",
-                      fontSize: 16,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Sign up with Google
-                  </Text>
-                </TouchableOpacity>
-              </>
+                  Sign Up
+                </Text>
+              </TouchableOpacity>
             )}
+
+            {/* Google Login Button */}
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "#FFFFFF",
+                borderColor: "#ECE6FF",
+                borderRadius: 12,
+                borderWidth: 1,
+                paddingVertical: 14,
+                shadowColor: "#0000001A",
+                shadowOpacity: 0.1,
+                shadowOffset: { width: 0, height: 1 },
+                shadowRadius: 3,
+                elevation: 3,
+              }}
+              onPress={handleGoogleLogin}
+            >
+              <Image
+                source={{
+                  uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/v1/rEqCGMmILJ/757sq175_expires_30_days.png",
+                }}
+                resizeMode={"stretch"}
+                style={{
+                  borderRadius: 12,
+                  width: 18,
+                  height: 18,
+                  marginRight: 12,
+                }}
+              />
+              <Text
+                style={{
+                  color: "#000000",
+                  fontSize: 16,
+                  fontWeight: "bold",
+                }}
+              >
+                Log in with Google
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

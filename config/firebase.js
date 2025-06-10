@@ -1,24 +1,20 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+// firebase.js
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDxXxXxXxXxXxXxXxXxXxXxXxXxXxXxXx",
-  authDomain: "your-app.firebaseapp.com",
-  projectId: "your-app",
-  storageBucket: "your-app.appspot.com",
-  messagingSenderId: "your-sender-id",
-  appId: "your-app-id",
+  apiKey: "AIzaSyBHF0EtCrDHnodw-SLzCyGwB6z3apSFgNY",
+  authDomain: "maaura-8caa9.firebaseapp.com",
+  projectId: "maaura-8caa9",
+  storageBucket: "maaura-8caa9.appspot.com", // Make sure the URL is correct
+  messagingSenderId: "1033476075965",
+  appId: "1:1033476075965:web:b384d9de19c448af90a2d4",
+  measurementId: "G-HZ7PPPBQM9"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+// Initialize Firebase only if not already initialized
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
-// Initialize Google Sign-In
-GoogleSignin.configure({
-  webClientId: 'your-web-client-id', // Get this from Firebase Console
-});
-
-export { auth, GoogleSignin };
+export const auth = firebase.auth();
