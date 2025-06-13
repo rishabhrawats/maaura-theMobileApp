@@ -8,6 +8,23 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "platforms": ["ios", "android", "web"],
+
+    "web": {
+      "build": {
+        "babel": {
+          "plugins": ["react-native-web"]
+        }
+      },
+      "favicon": "./assets/favicon.png", // Add your favicon here
+      "splash": {
+        "image": "./assets/splash.png", // Add splash image here
+        "resizeMode": "contain",
+        "backgroundColor": "#000000" // Splash background color
+      },
+      "browserReload": true
+    },
+
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.maaura.app"
@@ -15,6 +32,7 @@
     "android": {
       "package": "com.maaura.app"
     },
+
     "scheme": "maaura"
   }
 }
