@@ -6,8 +6,10 @@ import { auth } from './config/firebase'; // Import Firebase auth
 // Import screens
 import SplashScreen from './screens/SplashScreen';
 import LoginScreen from './screens/LoginScreen';
-import HomeScreen from './screens/HomeScreen';
-import QuestionnaireScreen from './screens/QuestionnaireScreen'; // Add the QuestionnaireScreen import
+import HomeScreen from './screens/HomeScreen'; // Ensure HomeScreen is imported
+import MindsetChallengeScreen from './screens/MindsetChallengeScreen'; // Import MindsetChallengeScreen
+import QuestionnaireScreen from './screens/QuestionnaireScreen'; // Import any other screens if needed
+import ThankYouScreen from './screens/ThankYouScreen'; // Import any other screens if needed
 
 const Stack = createNativeStackNavigator();
 
@@ -30,7 +32,6 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isLoggedIn ? (
-          // After logging in, navigate to the questionnaire if not completed
           !hasCompletedQuestionnaire ? (
             <Stack.Screen name="Questionnaire">
               {(props) => (
@@ -41,15 +42,16 @@ export default function App() {
               )}
             </Stack.Screen>
           ) : (
-            <Stack.Screen name="Home">
-              {(props) => <HomeScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
-            </Stack.Screen>
+            <Stack.Screen name="Home" component={HomeScreen} />
           )
         ) : (
-          <Stack.Screen name="Login">
-            {(props) => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
-          </Stack.Screen>
+          <Stack.Screen name="Login" component={LoginScreen} />
         )}
+
+        {/* Navigate to Mindset Challenge after Start Game */}
+        <Stack.Screen name="MindsetChallenge" component={MindsetChallengeScreen} />
+
+        <Stack.Screen name="ThankYou" component={ThankYouScreen} /> 
       </Stack.Navigator>
     </NavigationContainer>
   );

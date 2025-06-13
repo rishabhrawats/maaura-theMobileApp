@@ -1,55 +1,84 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import { WebView } from "react-native-webview"; // Import WebView for embedding YouTube video
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Animated } from 'react-native';
 
-export default function App() {
-  const [showWelcome, setShowWelcome] = useState(true); // State to track if welcome screen is visible
-  const [showHome, setShowHome] = useState(false); // State to track if homepage is visible
+export default function HomeScreen({ navigation }) {
+  const [selectedAvatar, setSelectedAvatar] = useState(null); // State to store selected avatar
+  const scaleValue = new Animated.Value(1); // For button animation
 
-  // Effect to hide the welcome message after 3 seconds
-  useEffect(() => {
-    if (showWelcome) {
-      setTimeout(() => {
-        setShowWelcome(false);
-        setShowHome(true); // Show the home screen after the welcome screen disappears
-      }, 3000); // 3000ms = 3 seconds
-    }
-  }, [showWelcome]);
+  // Animation for the Start Game button
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, {
+      toValue: 0.95,
+      friction: 4,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1,
+      friction: 4,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Avatar Selection
+  const handleAvatarSelect = (avatar) => {
+    setSelectedAvatar(avatar); // Update the selected avatar
+  };
+
+  // Check if an avatar is selected
+  const isAvatarSelected = selectedAvatar !== null;
 
   return (
     <View style={styles.container}>
-      {/* Welcome Screen */}
-      {showWelcome && (
-        <View style={styles.welcomeScreen}>
-          <Text style={styles.welcomeText}>Welcome to Mind Velocity</Text>
-        </View>
-      )}
+      {/* Background Color */}
+      <View style={styles.background}></View>
 
-      {/* Home Screen */}
-      {showHome && (
-        <View style={styles.homeScreen}>
-          <Text style={styles.homeHeading}>Home Page</Text>
-          
-          {/* Video Section */}
-          <View style={styles.videoContainer}>
-            <Text style={styles.videoHeading}>Your Video Starts Here</Text>
-            {/* WebView to embed YouTube video */}
-            <WebView
-              source={{ uri: 'https://www.youtube.com/embed/eHJnEHyyN1Y' }}  // Correct embed YouTube video URL
-              style={styles.videoWebview}
-              javaScriptEnabled={true}
-              domStorageEnabled={true}
-              allowsFullscreenVideo={true}  // Allow fullscreen playback
-            />
-            <Text style={styles.videoDescription}></Text>
-          </View>
-          
-          {/* Example Action Button */}
-          <TouchableOpacity style={styles.actionButton}>
-            <Text style={styles.buttonText}>Play Video</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      {/* Avatar Selection */}
+      <Text style={styles.welcomeText}>Choose Your Avatar</Text>
+
+      <View style={styles.avatarContainer}>
+        {/* Avatar 1: Visionary */}
+        <TouchableOpacity
+          style={[styles.avatarButton, selectedAvatar === 'Visionary' && styles.selectedAvatar]}
+          onPress={() => handleAvatarSelect('Visionary')}
+        >
+          <Image source={require('../Media/visionary.jpg')} style={styles.avatarImage} />
+          <Text style={styles.avatarText}>Visionary</Text>
+        </TouchableOpacity>
+
+        {/* Avatar 2: Igniter */}
+        <TouchableOpacity
+          style={[styles.avatarButton, selectedAvatar === 'Igniter' && styles.selectedAvatar]}
+          onPress={() => handleAvatarSelect('Igniter')}
+        >
+          <Image source={require('../Media/operator.jpg')} style={styles.avatarImage} />
+          <Text style={styles.avatarText}>Igniter</Text>
+        </TouchableOpacity>
+
+        {/* Avatar 3: Builder */}
+        <TouchableOpacity
+          style={[styles.avatarButton, selectedAvatar === 'Builder' && styles.selectedAvatar]}
+          onPress={() => handleAvatarSelect('Builder')}
+        >
+          <Image source={require('../Media/strategist.jpg')} style={styles.avatarImage} />
+          <Text style={styles.avatarText}>Builder</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Start Game Button with Animation */}
+      <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+        <TouchableOpacity
+          style={[styles.startButton, !isAvatarSelected && styles.disabledButton]}
+          onPress={() => isAvatarSelected && navigation.navigate('MindsetChallenge', { avatar: selectedAvatar })} // Pass the selected avatar to the MindsetChallenge screen
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          disabled={!isAvatarSelected} // Disable the button if no avatar is selected
+        >
+          <Text style={styles.buttonText}>Start Game</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }
@@ -57,84 +86,85 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f9f9f9",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#21152b',
+    paddingTop: 0,
+    paddingBottom: 30,
   },
-  welcomeScreen: {
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
+  background: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#000',
+    opacity: 0.8,
   },
   welcomeText: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#3800F5",
-    textAlign: "center",
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 30,
+    paddingHorizontal: 20,
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 5,
+  },
+  avatarContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center', // Center the avatars horizontally
+    alignItems: 'center', // Align them vertically in the center
+    marginBottom: 40,
+    width: '100%',
     paddingHorizontal: 20,
   },
-  homeScreen: {
-    flex: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    width: "100%",
-    padding: 20,
+  avatarButton: {
+    alignItems: 'center',
+    marginHorizontal: 15,
+    padding: 15,
+    borderRadius: 15,
+    backgroundColor: '#333',
+    width: 100,
+    justifyContent: 'center',
   },
-  homeHeading: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 30,
-    textAlign: "center",
+  selectedAvatar: {
+    borderWidth: 2,
+    borderColor: '#00A9FF',
   },
-  videoContainer: {
-    width: "100%",
-    height: 250,
-    backgroundColor: "#e0e0e0",
-    borderRadius: 12,
-    overflow: "hidden",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 30,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  videoHeading: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
+  avatarImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     marginBottom: 10,
   },
-  videoWebview: {
-    width: "100%",
-    height: "80%",
-    borderRadius: 10,
+  avatarText: {
+    color: '#fff',
+    fontSize: 14,
   },
-  videoDescription: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginTop: 10,
-  },
-  actionButton: {
-    backgroundColor: "#3800F5",
-    paddingVertical: 12,
-    paddingHorizontal: 40,
-    borderRadius: 12,
-    marginTop: 30,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
+  startButton: {
+    backgroundColor: '#00A9FF',
+    paddingVertical: 20,
+    paddingHorizontal: 60,
+    borderRadius: 25,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
-    elevation: 6,
+    shadowRadius: 15,
+    elevation: 8,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  disabledButton: {
+    backgroundColor: '#cccccc',
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: 'bold',
+    letterSpacing: 1.2,
+    textAlign: 'center',
   },
 });
