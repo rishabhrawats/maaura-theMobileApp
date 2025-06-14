@@ -10,51 +10,89 @@ export default function MindsetChallengeScreen({ route, navigation }) {
     Visionary: [
       {
         question: "Your most anticipated investor meeting just ended in a hard no. What’s your instinct?",
-        options: ["Fight", "Flight", "Freeze"],
+        options: [
+          "[Fight] Immediately schedule meetings with 3 new investors to validate your concept.",
+          "[Flight] Delay outreach and begin self-questioning the product idea.",
+          "[Freeze] Go silent for a few days, avoiding team communication and reflection.",
+        ],
       },
       {
         question: "Your core team is showing signs of mental fatigue. What’s your response?",
-        options: ["Fight", "Flight", "Freeze"],
+        options: [
+          "[Fight] Initiate a team huddle and reassign responsibilities to spread workload.",
+          "[Flight] Cancel all meetings and avoid addressing the issue openly.",
+          "[Freeze] Push timelines forward but stay indecisive about corrective steps.",
+        ],
       },
       {
         question: "You’re receiving negative press online. How do you respond?",
-        options: ["Fight", "Flight", "Freeze"],
+        options: [
+          "[Fight] Post a live video addressing issues with transparency.",
+          "[Flight] Remove your profile from social media to avoid seeing comments.",
+          "[Freeze] Draft 10 versions of a statement but publish none.",
+        ],
       },
     ],
     Builder: [
       {
         question: "You find yourself reviewing every little task. A team member confronts you. What do you do?",
-        options: ["Fight", "Flight", "Freeze"],
+        options: [
+          "[Fight] Call for a feedback session and invite radical honesty.",
+          "[Flight] Reassign the team member quietly and avoid conflict.",
+          "[Freeze] Keep working late nights to maintain control while avoiding the conversation.",
+        ],
       },
       {
         question: "An operational failure disrupted deliveries. What do you address first?",
-        options: ["Fight", "Flight", "Freeze"],
+        options: [
+          "[Fight] Launch an internal audit, assign owners, and fix the gaps.",
+          "[Flight] Blame external factors like vendors and defer accountability.",
+          "[Freeze] Postpone discussions and wait for the chaos to settle down.",
+        ],
       },
       {
         question: "Cash flow is tight. Your accountant warns you. What do you choose?",
-        options: ["Fight", "Flight", "Freeze"],
+        options: [
+          "[Fight] Hold a leadership meeting and take bold but calculated cuts.",
+          "[Flight] Avoid checking balance sheets until month-end.",
+          "[Freeze] Delay payroll while researching endless cost-saving ideas.",
+        ],
       },
     ],
     Igniter: [
       {
         question: "You get a new idea during a team call and consider pivoting the product. What’s next?",
-        options: ["Fight", "Flight", "Freeze"],
+        options: [
+          "[Fight] Call for a strategy jam session and make a 24-hr pivot map.",
+          "[Flight] Drop the idea completely and pretend it never came up.",
+          "[Freeze] Journal it obsessively but take no real action.",
+        ],
       },
       {
         question: "Two key hires clash emotionally in a meeting. You’re present. What’s your reaction?",
-        options: ["Fight", "Flight", "Freeze"],
+        options: [
+          "[Fight] Step in and defuse the energy, then initiate 1-on-1s.",
+          "[Flight] Let them resolve it themselves without intervention.",
+          "[Freeze] Sit silently while the tension escalates.",
+        ],
       },
       {
         question: "After working 16 hours straight, you feel dizzy. You still have tasks. What do you do?",
-        options: ["Fight", "Flight", "Freeze"],
+        options: [
+          "[Fight] Schedule a recovery day, delegate the night task.",
+          "[Flight] Skip the task and binge content to numb yourself.",
+          "[Freeze] Stare at your laptop without doing anything.",
+        ],
       },
     ],
   };
 
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // Tracks the current question
+  const [answers, setAnswers] = useState([]); // Stores answers for each question
+  const [xp, setXp] = useState(0); // Stores XP
+  const [resilienceScore, setResilienceScore] = useState(0); // Resilience Score based on "Fight" answers
   const [timer, setTimer] = useState(30); // 30-second timer for each question
-  const [isTimerRunning, setIsTimerRunning] = useState(true);
+  const [isTimerRunning, setIsTimerRunning] = useState(true); // Timer logic
 
   // Timer setup
   useEffect(() => {
@@ -71,19 +109,25 @@ export default function MindsetChallengeScreen({ route, navigation }) {
         });
       }, 1000);
     }
-
     return () => clearInterval(interval); // Clear interval on component unmount or when the timer stops
   }, [isTimerRunning, currentQuestionIndex]);
 
   const handleAnswerSelection = (answer) => {
     setAnswers((prevAnswers) => [...prevAnswers, answer]);
 
+    // Calculate XP and Resilience Score based on the answer
+    if (answer.includes('Fight')) {
+      setXp((prevXp) => prevXp + 10); // Fight gives +10 XP
+      setResilienceScore((prevScore) => prevScore + 1); // Fight gives +1 Resilience
+    } else if (answer.includes('Flight') || answer.includes('Freeze')) {
+      setXp((prevXp) => prevXp + 5); // Flight and Freeze give +5 XP
+    }
+
     if (currentQuestionIndex === questions[avatar].length - 1) {
-      // After answering the last question, navigate to the ThankYouScreen and save the responses
-      handleSubmit();
+      handleSubmit(); // Submit answers after the last question
     } else {
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-      setTimer(30); // Reset the timer
+      setTimer(30); // Reset the timer for the next question
     }
   };
 
@@ -96,6 +140,8 @@ export default function MindsetChallengeScreen({ route, navigation }) {
           email: user.email, // Store user email
           avatar: avatar, // Store selected avatar
           answers: answers, // Store answers for each question
+          xp: xp, // Store the total XP
+          resilienceScore: resilienceScore, // Store resilience score
         });
 
         Alert.alert("Thank you!", "Your answers have been saved!");

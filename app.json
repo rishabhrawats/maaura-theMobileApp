@@ -8,31 +8,42 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "platforms": ["ios", "android", "web"],
-
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "web": {
       "build": {
         "babel": {
-          "plugins": ["react-native-web"]
+          "plugins": [
+            "react-native-web"
+          ]
         }
       },
-      "favicon": "./assets/favicon.png", // Add your favicon here
+      "favicon": "./assets/favicon.png",
       "splash": {
-        "image": "./assets/splash.png", // Add splash image here
+        "image": "./assets/splash.png",
         "resizeMode": "contain",
-        "backgroundColor": "#000000" // Splash background color
+        "backgroundColor": "#000000"
       },
       "browserReload": true
     },
-
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.maaura.app"
+      "bundleIdentifier": "com.maaura.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.maaura.app"
     },
-
-    "scheme": "maaura"
+    "scheme": "maaura",
+    "extra": {
+      "eas": {
+        "projectId": "60029b43-43c6-4139-89d3-03a7b2a829a2"
+      }
+    }
   }
 }
